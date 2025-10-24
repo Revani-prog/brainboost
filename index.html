@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainBoost</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: black;
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    overflow-x: hidden;
+    height: 100vh;
+  }
+
+  /* Intro overlay */
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    overflow: hidden;
+  }
+
+  .plane-title {
+    display: flex;
+    align-items: center;
+    font-size: 60px;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    left: -100%;
+    animation: planeFly 5s ease forwards;
+    gap: 15px;
+  }
+
+  .plane-title span {
+    font-size: 100px;
+  }
+
+  @keyframes planeFly {
+    0% { left: -100%; }
+    60% { left: 25%; }
+    80% { left: 50%; opacity: 1; }
+    100% { left: 120%; opacity: 0; }
+  }
+
+  @keyframes glitter {
+    0% { background-position: -200px; }
+    100% { background-position: 200px; }
+  }
+
+  .glitter {
+    background: linear-gradient(90deg, #fff, #ffd700, #fff);
+    background-size: 200px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glitter 2s infinite linear;
+  }
+
+  main {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    transition: opacity 1s ease;
+  }
+
+  header {
+    margin-top: 80px;
+  }
+
+  header h1 {
+    font-size: clamp(28px, 6vw, 55px);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-shadow: 0px 4px 20px rgba(255,255,255,0.3);
+  }
+
+  .button-container {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .button-container button {
+    background: #ff0077;
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .button-container button:hover {
+    transform: scale(1.05);
+    background: #ff3399;
+  }
+
+  .lang-select {
+    margin-top: 30px;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+  }
+
+  /* Info button */
+  #infoBtn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #0077ff;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  /* Info Box */
+  #infoBox {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 15px;
+    background: rgba(0,0,0,0.9);
+    padding: 15px;
+    border-radius: 10px;
+    width: 250px;
+    color: #fff;
+    text-align: left;
+    font-size: 14px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    z-index: 1000;
+  }
+</style>
+</head>
+<body>
+
+<!-- Intro Screen -->
+<div id="intro">
+  <div class="plane-title">
+    <span>✈️</span>
+    <div class="glitter">BrainBoost</div>
+  </div>
+</div>
+
+<!-- Info Button & Box -->
+<button id="infoBtn">ℹ️</button>
+<div id="infoBox">
+  <h3>About BrainBoost</h3>
+  <p>BrainBoost is your interactive hub for learning and fun. Explore calculators, stories, and games that challenge and grow your mind!</p>
+</div>
+
+<!-- Main Content -->
+<main id="main">
+  <header>
+    <h1>🌟 BrainBoost 🌟</h1>
+    <p>Your Gateway to Interactive Learning & Fun</p>
+  </header>
+
+  <select id="language" class="lang-select">
+    <option value="en">English</option>
+    <option value="hi">हिन्दी (Hindi)</option>
+    <option value="ta">தமிழ் (Tamil)</option>
+  </select>
+
+  <div class="button-container">
+    <button onclick="window.location.href='calc.html'">🧮 Calculator</button>
+    <button onclick="speakAndGo('story')">📖 Story</button>
+    <button onclick="speakAndGo('game')">🎮 Game</button>
+  </div>
+</main>
+
+<script>
+  const intro = document.getElementById('intro');
+  const main = document.getElementById('main');
+  const languageSelect = document.getElementById('language');
+  const infoBtn = document.getElementById('infoBtn');
+  const infoBox = document.getElementById('infoBox');
+
+  // Hide intro after animation
+  setTimeout(() => {
+    intro.style.display = "none";
+    main.style.opacity = "1";
+  }, 5200);
+
+  // Toggle Info Box
+  infoBtn.addEventListener('click', () => {
+    infoBox.style.display = (infoBox.style.display === "block") ? "none" : "block";
+  });
+
+  // Funny lines in multiple languages
+  const lines = {
+    story: {
+      en: "Let's dive into imagination!",
+      hi: "आइए कल्पना की दुनिया में जाएं!",
+      ta: "கற்பனை உலகில் மூழ்குவோம்!"
+    },
+    game: {
+      en: "Time to level up your brain!",
+      hi: "अब दिमाग़ को लेवल अप करने का समय है!",
+      ta: "உன் மூளையை மேம்படுத்த நேரம் வந்துவிட்டது!"
+    }
+  };
+
+  // Page mapping
+  const pages = {
+    story: "story.html",
+    game: "game.html"
+  };
+
+  function speakAndGo(type) {
+    const lang = languageSelect.value;
+    const text = lines[type][lang] || lines[type]["en"];
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang === "hi" ? "hi-IN" : lang === "ta" ? "ta-IN" : "en-US";
+
+    // When speech finishes, redirect
+    utterance.onend = () => {
+      window.location.href = pages[type];
+    };
+
+    speechSynthesis.speak(utterance);
+  }
+</script>
+
+</body>
+</html>
