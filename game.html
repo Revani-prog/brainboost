@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainBoost: Catch the Fruits!</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to top, #ffc0cb 70%, #ff69b4 30%);
+    text-align: center;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  header {
+    padding: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px #aa1451;
+  }
+
+  #instructions {
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    background-color: rgba(255, 192, 203, 0.5);
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 18px;
+    color: #330033;
+  }
+
+  #scoreBoard {
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px #aa1451;
+  }
+
+  #gameCanvas {
+    display: block;
+    margin: 20px auto;
+    border: 3px solid #aa1451;
+    border-radius: 20px;
+    background: #ffe6f0;
+  }
+
+  .controls {
+    margin-top: 10px;
+  }
+
+  button {
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    font-weight: bold;
+    background: #ff69b4;
+    color: #fff;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #ff1493;
+  }
+
+  #clapEmoji {
+    position: absolute;
+    font-size: 50px;
+    display: none;
+    animation: bounce 1s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  #juiceDiv {
+    margin-top: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #330033;
+  }
+
+  #homeBtn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+    background: #fff;
+    color: #ff69b4;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  footer {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #330033;
+  }
+</style>
+</head>
+<body>
+
+<header>🍹 BrainBoost: Catch the Fruits!</header>
+
+<button id="homeBtn" onclick="location.href='a.html'">🏠 Home</button>
+
+<div id="instructions">
+  <strong>Instructions:</strong><br>
+  - Move the basket using <strong>arrow keys</strong>, <strong>mouse</strong>, <strong>voice commands</strong> ("left"/"right"), or <strong>on-screen buttons</strong>.<br>
+  - Catch as many fruits as possible!<br>
+  - When your score reaches <strong>20</strong>, BrainBoost makes a juice for you based on the fruits you caught!<br>
+  - Enjoy and have fun!
+</div>
+
+<div id="scoreBoard">Score: 0</div>
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+
+<div class="controls">
+  <button id="leftBtn">⬅️ Left</button>
+  <button id="rightBtn">➡️ Right</button>
+</div>
+
+<div id="clapEmoji">👏👏👏</div>
+<div id="juiceDiv"></div>
+
+<footer>Made with ❤️ by BrainBoost</footer>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const basket = {
+    name: "Rain",
+    width: 120,
+    height: 30,
+    x: canvas.width / 2 - 60,
+    y: canvas.height - 50,
+    speed: 5,
+    dx: 0
+};
+
+const fruits = [];
+const fruitTypes = ['🍎','🍌','🍇','🍊','🍉'];
+let score = 0;
+let rewardActivated = false;
+
+// Fruit counter for juice
+const fruitCounter = { '🍎':0, '🍌':0, '🍇':0, '🍊':0, '🍉':0 };
+
+// Draw basket
+function drawBasket() {
+    ctx.fillStyle = '#ff1493';
+    ctx.beginPath();
+    ctx.moveTo(basket.x, basket.y);
+    ctx.lineTo(basket.x + basket.width, basket.y);
+    ctx.lineTo(basket.x + basket.width - 10, basket.y + basket.height);
+    ctx.lineTo(basket.x + 10, basket.y + basket.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = "16px Arial";
+    ctx.fillText(basket.name, basket.x + 20, basket.y - 5);
+}
+
+// Draw fruits
+function drawFruits() {
+    for(const f of fruits) {
+        ctx.font = f.size + "px Arial";
+        ctx.fillText(f.type, f.x, f.y);
+    }
+}
+
+// Spawn fruits
+function createFruit() {
+    const x = Math.random() * (canvas.width - 30);
+    const type = fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
+    fruits.push({ x: x, y: 0, size: 30, type: type });
+}
+
+// Update basket
+function updateBasket() {
+    basket.x += basket.dx;
+    if(basket.x < 0) basket.x = 0;
+    if(basket.x + basket.width > canvas.width) basket.x = canvas.width - basket.width;
+}
+
+// Reward logic
+function checkReward() {
+    if(score >= 20 && !rewardActivated) {
+        rewardActivated = true;
+
+        const clap = document.getElementById('clapEmoji');
+        clap.style.display = 'block';
+        clap.style.left = (canvas.offsetLeft + canvas.width/2 - 50) + 'px';
+        clap.style.top = (canvas.offsetTop + canvas.height/2 - 50) + 'px';
+
+        basket.width += 50;
+
+        // Generate juice
+        generateJuice();
+
+        setTimeout(() => clap.style.display = 'none', 3000);
+    }
+}
+
+function generateJuice() {
+    const juiceDiv = document.getElementById('juiceDiv');
+    let maxFruit = Object.keys(fruitCounter).reduce((a,b) => fruitCounter[a] > fruitCounter[b] ? a : b);
+    let juiceType = "";
+    switch(maxFruit) {
+        case '🍎': juiceType = "Apple Juice 🍎"; break;
+        case '🍌': juiceType = "Banana Smoothie 🍌"; break;
+        case '🍇': juiceType = "Grape Juice 🍇"; break;
+        case '🍊': juiceType = "Orange Juice 🍊"; break;
+        case '🍉': juiceType = "Watermelon Juice 🍉"; break;
+    }
+    juiceDiv.innerText = `🎉 Congratulations! You made: ${juiceType}`;
+}
+
+// Game loop
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    updateBasket();
+    drawBasket();
+    drawFruits();
+
+    for(let i = 0; i < fruits.length; i++) {
+        const f = fruits[i];
+        f.y += 4;
+
+        if(f.y + f.size > basket.y && f.x + f.size > basket.x && f.x < basket.x + basket.width) {
+            score += 1;
+            fruitCounter[f.type] += 1;
+            document.getElementById('scoreBoard').innerText = "Score: " + score;
+            fruits.splice(i, 1);
+            i--;
+        } else if(f.y > canvas.height) {
+            fruits.splice(i, 1);
+            i--;
+        }
+    }
+
+    checkReward();
+    requestAnimationFrame(gameLoop);
+}
+
+// Spawn fruits
+setInterval(createFruit, 1000);
+gameLoop();
+
+// --- Voice Control ---
+function startVoiceControl() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+        const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+        if(command.includes("left")) {
+            basket.dx = -basket.speed;
+            setTimeout(() => basket.dx = 0, 300);
+        } else if(command.includes("right")) {
+            basket.dx = basket.speed;
+            setTimeout(() => basket.dx = 0, 300);
+        }
+    };
+
+    recognition.onerror = (event) => console.log("Voice error:", event.error);
+    recognition.start();
+}
+startVoiceControl();
+
+// --- Mouse control ---
+canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    basket.x = mouseX - basket.width / 2;
+});
+
+// --- Button controls ---
+document.getElementById('leftBtn').addEventListener('mousedown', () => basket.dx = -basket.speed);
+document.getElementById('leftBtn').addEventListener('mouseup', () => basket.dx = 0);
+document.getElementById('rightBtn').addEventListener('mousedown', () => basket.dx = basket.speed);
+document.getElementById('rightBtn').addEventListener('mouseup', () => basket.dx = 0);
+</script>
+
+</body>
+</html>

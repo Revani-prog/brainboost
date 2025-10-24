@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainBoost - Flip Card Calculator</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #9333ea, #f43f5e, #1e3a8a);
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    color: #fff;
+    flex-direction: column;
+    text-align: center;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    margin: 10px 0;
+    font-size: 2.5em;
+    font-weight: bold;
+    background: linear-gradient(90deg, #facc15, #f472b6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 2s infinite alternate;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 5px #fff; }
+    to   { text-shadow: 0 0 20px #f9a8d4, 0 0 30px #a78bfa; }
+  }
+
+  p.instructions {
+    max-width: 700px;
+    font-size: 18px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    background-color: rgba(255,255,255,0.15);
+    padding: 15px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Flip Card */
+  .flip-card {
+    background: transparent;
+    width: 95%;
+    max-width: 420px;
+    height: 520px;
+    perspective: 1200px;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.9s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    backface-visibility: hidden;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(12px);
+  }
+  .flip-card-front {
+    background: rgba(255,255,255,0.15);
+  }
+  .flip-card-back {
+    transform: rotateY(180deg);
+    background: rgba(0,0,0,0.25);
+    overflow-y: auto;
+  }
+
+  /* Calculator Display */
+  .display {
+    width: 100%;
+    height: 70px;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    text-align: right;
+    font-size: 1.8em;
+    padding: 12px;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+  }
+
+  /* Buttons */
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  button.calc-btn {
+    height: 65px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  button.calc-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(255,255,255,0.6);
+  }
+  .operator { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .equal { background: linear-gradient(135deg, #22c55e, #16a34a); grid-column: span 2; }
+  .clear { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+
+  /* Fun Zone */
+  .fun-zone {
+    background: rgba(255,255,255,0.15);
+    padding: 18px;
+    border-radius: 15px;
+    min-height: 220px;
+    font-size: 1.2em;
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in;
+  }
+  .group-row { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+  .box {
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    padding: 8px;
+    margin: 5px;
+    min-width: 60px;
+    text-align: center;
+    background: rgba(255,255,255,0.25);
+    font-size: 1.2em;
+  }
+  .leftover {
+    background: rgba(244,114,182,0.4);
+    border-color: #db2777;
+  }
+
+  /* Buttons Back */
+  .back-btn {
+    margin-top: 15px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: transform 0.2s;
+  }
+  .back-btn:hover { transform: scale(1.05); }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<h1>BrainBoost</h1>
+<p class="instructions">
+  🚀 Welcome to <b>BrainBoost Flip Card Calculator!</b><br>
+  ✨ Solve equations and see <b>fun visual grouping</b> with bears 🐻.<br>
+  🔄 Tap <b>Back</b> to return or 🏠 Home to go to main hub.<br>
+  🎉 Learning math has never been this fun!
+</p>
+
+<div class="flip-card" id="flip-card">
+  <div class="flip-card-inner">
+    
+    <!-- FRONT: Calculator -->
+    <div class="flip-card-front">
+      <input type="text" class="display" id="display" disabled>
+      <div class="buttons">
+        <button class="calc-btn clear" onclick="clearDisplay()">AC</button>
+        <button class="calc-btn" onclick="deleteLast()">DEL</button>
+        <button class="calc-btn operator" onclick="append('/')">÷</button>
+        <button class="calc-btn operator" onclick="append('*')">×</button>
+
+        <button class="calc-btn" onclick="append('7')">7</button>
+        <button class="calc-btn" onclick="append('8')">8</button>
+        <button class="calc-btn" onclick="append('9')">9</button>
+        <button class="calc-btn operator" onclick="append('-')">−</button>
+
+        <button class="calc-btn" onclick="append('4')">4</button>
+        <button class="calc-btn" onclick="append('5')">5</button>
+        <button class="calc-btn" onclick="append('6')">6</button>
+        <button class="calc-btn operator" onclick="append('+')">+</button>
+
+        <button class="calc-btn" onclick="append('1')">1</button>
+        <button class="calc-btn" onclick="append('2')">2</button>
+        <button class="calc-btn" onclick="append('3')">3</button>
+        <button class="calc-btn equal" onclick="calculate()">=</button>
+
+        <button class="calc-btn" onclick="append('0')">0</button>
+      </div>
+    </div>
+
+    <!-- BACK: Fun zone -->
+    <div class="flip-card-back">
+      <h2>🎉 Math Magic!</h2>
+      <div class="fun-zone" id="fun-zone">👉 Do a calculation to see magic!</div>
+      <button class="back-btn" onclick="flipBack()">🔙 Back</button>
+      <button class="back-btn" onclick="location.href='a.html'">🏠 Home</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById("display");
+  const funZone = document.getElementById("fun-zone");
+  const flipCard = document.getElementById("flip-card");
+
+  function append(value) { display.value += value; }
+  function clearDisplay() {
+    display.value = "";
+    funZone.innerHTML = "👉 Do a calculation to see magic!";
+  }
+  function deleteLast() { display.value = display.value.slice(0, -1); }
+
+  function calculate() {
+    let expr = display.value;
+    try {
+      let result = eval(expr);
+      display.value = result;
+      showFun(expr, result);
+      flipCard.classList.add("flipped"); // flip to back
+    } catch {
+      display.value = "Error";
+      funZone.innerHTML = "❌ Oops, try again!";
+    }
+  }
+
+  function flipBack() {
+    flipCard.classList.remove("flipped");
+  }
+
+  function showFun(expr, result) {
+    let output = "";
+    let bear = "🐻";
+
+    if (expr.includes("+")) {
+      let [a,b] = expr.split("+").map(Number);
+      output = `<b>${a} + ${b} = ${result}</b><br><br>`;
+      output += `<div class="group-row">
+                   <div class="box">${bear.repeat(a)}</div>
+                   <div class="box">${bear.repeat(b)}</div>
+                 </div>
+                 <div class="group-row"><div class="box">${bear.repeat(result)}</div></div>`;
+    }
+    else if (expr.includes("-")) {
+      let [a,b] = expr.split("-").map(Number);
+      output = `<b>${a} − ${b} = ${result}</b><br><br>`;
+      output += `<div class="group-row">
+                   <div class="box">${bear.repeat(a)}</div>
+                   <div class="box">remove ${bear.repeat(b)}</div>
+                 </div>
+                 <div class="group-row"><div class="box">${bear.repeat(result)}</div></div>`;
+    }
+    else if (expr.includes("*")) {
+      let [a,b] = expr.split("*").map(Number);
+      output = `<b>${a} × ${b} = ${result}</b><br><br>`;
+      output += `<div class="group-row">`;
+      for (let i=0;i<a;i++) {
+        output += `<div class="box">${bear.repeat(b)}</div>`;
+      }
+      output += `</div>`;
+    }
+    else if (expr.includes("/")) {
+      let [a,b] = expr.split("/").map(Number);
+      let quotient = Math.floor(a/b);
+      let remainder = a % b;
+      output = `<b>${a} ÷ ${b} = ${quotient} groups, ${remainder} leftover</b><br><br>`;
+      output += `<div class="group-row">`;
+      for (let i=0;i<quotient;i++) {
+        output += `<div class="box">${bear.repeat(b)}</div>`;
+      }
+      if(remainder>0){
+        output += `<div class="box leftover">${bear.repeat(remainder)} (leftover)</div>`;
+      }
+      output += `</div>`;
+    }
+    else {
+      output = `Result: ${result}`;
+    }
+
+    funZone.innerHTML = output + "<br>🎊 Great Job!";
+  }
+</script>
+
+</body>
+</html>

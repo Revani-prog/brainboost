@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Epic Travel Adventure</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    color: #fff;
+    background: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1350&q=80") no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 1s ease-in-out, filter 0.5s ease-in-out;
+    filter: brightness(0.9);
+  }
+
+  /* Home button */
+  .home-btn {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: #ff7e5f;
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  .home-btn:hover {
+    background: #feb47b;
+  }
+
+  .story-box {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 700px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    animation: fadeIn 1s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 { font-size: 1.5rem; margin-bottom: 20px; line-height: 1.4; }
+
+  .choices button, #startButton, #restartButton {
+    margin: 10px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg,#ff7e5f,#feb47b);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .choices button:hover, #startButton:hover, #restartButton:hover {
+    background: linear-gradient(90deg,#feb47b,#ff7e5f);
+  }
+
+  .hidden { display: none; }
+
+  .story-highlight {
+    color: #ffd700;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <!-- Home Button -->
+  <a href="a.html" class="home-btn">🏠 Home</a>
+
+  <div class="story-box">
+    <h2 id="story">Welcome to the Epic Travel Adventure! 🌍</h2>
+    <div id="intro">
+      <button id="startButton">Start Your Journey</button>
+    </div>
+    <div class="choices hidden" id="choices"></div>
+  </div>
+
+<script>
+const storyElement = document.getElementById("story");
+const choicesElement = document.getElementById("choices");
+const introElement = document.getElementById("intro");
+const body = document.body;
+
+const story = {
+  start: {
+    text: "Where do you want to explore first? 🌎 Each place holds surprises!",
+    background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1350&q=80",
+    choices: [
+      { text: "Sunny Beach 🌊", next: "beach" },
+      { text: "Majestic Mountains 🏔️", next: "mountains" },
+      { text: "Vibrant City 🏙️", next: "city" },
+      { text: "Jungle Safari 🌿", next: "jungle" },
+      { text: "Desert Oasis 🏜️", next: "desert" },
+      { text: "Magical Island 🏝️", next: "island" }
+    ]
+  },
+  beach: {
+    text: "The sun is shining and waves are dancing! How will you enjoy the beach? 🏖️",
+    background: "https://images.unsplash.com/photo-1493558103817-58b2924bce98?auto=format&fit=crop&w=1350&q=80",
+    choices: [
+      { text: "Surf the waves 🏄", next: "surf" },
+      { text: "Relax in a hammock 🌴", next: "hammock" },
+      { text: "Build a sandcastle 🏰", next: "sandcastle" },
+      { text: "Collect seashells 🐚", next: "seashells" }
+    ]
+  },
+  mountains: {
+    text: "The mountains are calling! Adventure awaits at every peak ⛰️",
+    background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1350&q=80",
+    choices: [
+      { text: "Hike to the peak 🥾", next: "hike" },
+      { text: "Camp under the stars ⛺", next: "camp" },
+      { text: "Go paragliding 🪂", next: "paraglide" },
+      { text: "Find hidden waterfall 💦", next: "waterfall" }
+    ]
+  },
+  city: {
+    text: "The city is alive! Lights, music, and fun everywhere 🌆",
+    background: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&fit=crop&w=1350&q=80",
+    choices: [
+      { text: "Visit a museum 🖼️", next: "museum" },
+      { text: "Try local street food 🍲", next: "food" },
+      { text: "Go shopping 🛍️", next: "shopping" },
+      { text: "Attend a music festival 🎶", next: "festival" }
+    ]
+  },
+  jungle: {
+    text: "You step into the wild jungle 🌿. The sounds of wildlife surround you!",
+    background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80",
+    choices: [
+      { text: "Spot exotic birds 🦜", next: "birds" },
+      { text: "Follow a hidden trail 🚶", next: "trail" },
+      { text: "Cross the swinging bridge 🌉", next: "bridge" }
+    ]
+  },
+  desert: {
+    text: "Golden sands stretch endlessly. The sun blazes above 🏜️",
+    background: "https://images.unsplash.com/photo-1516910817561-9d2980c5dc0d?auto=format&w=1350&q=80",
+    choices: [
+      { text: "Ride a camel 🐪", next: "camel" },
+      { text: "Find hidden oasis 💧", next: "oasis" },
+      { text: "Sandboarding adventure 🏂", next: "sandboard" }
+    ]
+  },
+  island: {
+    text: "A magical island full of secrets and sparkling beaches 🏝️",
+    background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80",
+    choices: [
+      { text: "Explore hidden caves 🪨", next: "caves" },
+      { text: "Swim with dolphins 🐬", next: "dolphins" },
+      { text: "Find a treasure chest 🏴‍☠️", next: "treasure" }
+    ]
+  },
+  // Beach outcomes
+  surf: { text: "You ride the waves like a pro! 🌊🏄 Feel the thrill and splash around!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  hammock: { text: "Relaxing in a hammock, listening to waves 🌴😌 Peaceful moments!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  sandcastle: { text: "Your sandcastle is magnificent! Everyone admires it 🏰👏", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  seashells: { text: "You collect rare seashells 🐚✨ A treasure trove from the sea!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  // Mountains outcomes
+  hike: { text: "You reach the summit! The view is breathtaking 🌄🥾", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  camp: { text: "Under the stars, night feels magical ✨⛺", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  paraglide: { text: "You soar through the sky! Wind rushing 🪂🌬️", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  waterfall: { text: "A hidden waterfall cascades down 🌊💦 Nature’s secret gem!", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  // City outcomes
+  museum: { text: "Art and history fascinate you 🎨🏛️ What a cultural feast!", background: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&w=1350&q=80", choices: [] },
+  food: { text: "The street food is scrumptious 🍲😋 Taste explosion!", background: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&w=1350&q=80", choices: [] },
+  shopping: { text: "Unique treasures found 🛍️💎 Shopping spree success!", background: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&w=1350&q=80", choices: [] },
+  festival: { text: "Music fills the air 🎶🕺 Dancing under the lights!", background: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?auto=format&w=1350&q=80", choices: [] },
+  // Jungle outcomes
+  birds: { text: "Colorful birds 🦜 chirp beautifully! You feel alive!", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  trail: { text: "You find a mysterious jungle trail 🌿✨ Adventure awaits!", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  bridge: { text: "Crossing the swinging bridge 🌉 thrills you to the core!", background: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&w=1350&q=80", choices: [] },
+  // Desert outcomes
+  camel: { text: "Camel ride through golden dunes 🐪🏜️ The sun warms your soul!", background: "https://images.unsplash.com/photo-1516910817561-9d2980c5dc0d?auto=format&w=1350&q=80", choices: [] },
+  oasis: { text: "You discover a sparkling oasis 💧🌴 Refreshing and magical!", background: "https://images.unsplash.com/photo-1516910817561-9d2980c5dc0d?auto=format&w=1350&q=80", choices: [] },
+  sandboard: { text: "Zooming down the dunes 🏂💨 Excitement overload!", background: "https://images.unsplash.com/photo-1516910817561-9d2980c5dc0d?auto=format&w=1350&q=80", choices: [] },
+  // Island outcomes
+  caves: { text: "Hidden caves reveal sparkling crystals 🪨✨ You feel like a treasure hunter!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  dolphins: { text: "Swimming with dolphins 🐬💦 Joyful splashes and laughter!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] },
+  treasure: { text: "You discover a treasure chest 🏴‍☠️💰 Filled with gold and jewels!", background: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=1350&q=80", choices: [] }
+};
+
+function showScene(sceneKey) {
+  const scene = story[sceneKey];
+  storyElement.textContent = scene.text;
+  body.style.backgroundImage = `url(${scene.background})`;
+  body.style.filter = `brightness(${0.8 + Math.random() * 0.2})`;
+  choicesElement.innerHTML = "";
+  choicesElement.classList.remove("hidden");
+  introElement.classList.add("hidden");
+
+  if(scene.choices.length === 0){
+    const restartBtn = document.createElement("button");
+    restartBtn.textContent = "Restart Adventure";
+    restartBtn.id="restartButton";
+    restartBtn.onclick = ()=>{
+      introElement.classList.remove("hidden");
+      choicesElement.classList.add("hidden");
+      storyElement.textContent = "Welcome to the Epic Travel Adventure! 🌍";
+      body.style.backgroundImage = `url(${story.start.background})`;
+      body.style.filter = `brightness(0.9)`;
+    };
+    choicesElement.appendChild(restartBtn);
+    return;
+  }
+
+  scene.choices.forEach(choice=>{
+    const button=document.createElement("button");
+    button.textContent = choice.text;
+    button.onclick = ()=> showScene(choice.next);
+    choicesElement.appendChild(button);
+  });
+}
+
+document.getElementById("startButton").onclick = ()=>showScene("start");
+</script>
+</body>
+</html>
